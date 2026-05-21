@@ -185,6 +185,15 @@ function originalLink(book) {
   return `<a class="start-button" href="${book.link}" data-go-link="${book.link}" rel="noreferrer">去原站阅读 ↗</a>`;
 }
 
+function showDrawerDialog() {
+  dialog.classList.add("drawer-dialog");
+  dialog.showModal();
+  dialog.scrollTop = 0;
+  dialogContent.scrollTop = 0;
+  const sheet = dialogContent.querySelector(".drawer-sheet");
+  if (sheet) sheet.scrollTop = 0;
+}
+
 function matchesCollection(book, keyword = "强强") {
   const text = `${book.title} ${book.author} ${(book.tags || []).join(" ")} ${book.hook} ${book.summary}`;
   return text.includes(keyword);
@@ -515,8 +524,7 @@ function openCollection(keyword = "强强", title = "强强互探合集") {
       </article>
     </section>
   `;
-  dialog.classList.add("drawer-dialog");
-  dialog.showModal();
+  showDrawerDialog();
 }
 
 function openBook(id) {
@@ -551,7 +559,7 @@ function openBook(id) {
       </article>
     </section>
   `;
-  dialog.showModal();
+  showDrawerDialog();
 }
 
 document.addEventListener("click", async (event) => {
