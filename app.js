@@ -486,8 +486,8 @@ function openCollection(keyword = "强强", title = "强强互探合集") {
   const book = pool[idx];
   const favored = isFav(book.id);
   dialogContent.innerHTML = `
-    <button class="close-dialog" id="close-dialog">×</button>
     <section class="drawer-sheet">
+      <button class="close-dialog" id="close-dialog" aria-label="关闭弹窗">×</button>
       <div class="drawer-head">
         <div>
           <p class="eyebrow">合集：${keyword}</p>
@@ -526,8 +526,8 @@ function openBook(id) {
   dialog.classList.add("drawer-dialog");
   const favored = isFav(book.id);
   dialogContent.innerHTML = `
-    <button class="close-dialog" id="close-dialog">×</button>
     <section class="drawer-sheet">
+      <button class="close-dialog" id="close-dialog" aria-label="关闭弹窗">×</button>
       <div class="drawer-head">
         <div>
           <p class="eyebrow">书籍详情</p>
