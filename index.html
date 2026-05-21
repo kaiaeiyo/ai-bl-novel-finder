@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>智能搜文助手</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <aside class="side-rail" aria-label="主导航">
+      <div class="brand-mark">文</div>
+      <button class="rail-item active" data-page="home" aria-label="首页">⌂</button>
+      <button class="rail-item" data-page="square" aria-label="广场">▥</button>
+      <button class="rail-item" data-page="chat" aria-label="找文搭子">◌</button>
+      <button class="rail-item" data-page="wheel" aria-label="求签">⌘</button>
+      <button class="rail-item" data-page="profile" aria-label="我的">♡</button>
+      <button class="rail-menu" aria-label="菜单">☰</button>
+    </aside>
+
+    <section class="content-panel">
+      <header class="top-search">
+        <span class="search-icon">⌕</span>
+        <input id="global-search" value="" placeholder="搜索书名、作者、标签..." />
+      </header>
+
+      <div id="page-root"></div>
+    </section>
+
+    <aside class="reader-panel">
+      <header class="profile-line">
+        <div class="avatar"></div>
+        <span>今晚读点什么</span>
+      </header>
+
+      <section class="featured-book">
+        <p class="eyebrow" id="side-label">精准匹配</p>
+        <h2 id="side-title">《破云》</h2>
+        <p><strong id="side-progress">154</strong> / 300 章</p>
+        <blockquote id="side-hook">“刑侦线和双强对峙一起往前推，关系感不是硬凑出来的。”</blockquote>
+      </section>
+
+      <section class="schedule-card">
+        <h2>阅读计划</h2>
+        <div class="calendar-row">
+          <span>周日<br><b>11</b></span>
+          <span>周一<br><b>12</b></span>
+          <span class="today">周二<br><b>13</b></span>
+          <span>周三<br><b>14</b></span>
+          <span>周四<br><b>15</b></span>
+          <span>周五<br><b>16</b></span>
+        </div>
+      </section>
+
+      <section class="friends-card">
+        <h2>同担书友</h2>
+        <div class="friend">
+          <div class="mini-avatar"></div>
+          <div>
+            <strong>同担推荐</strong>
+            <p>这本的后劲主要在人物关系，不是硬虐。</p>
+          </div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <nav class="mobile-nav" aria-label="移动端导航">
+    <button class="active" data-page="home">首页</button>
+    <button data-page="square">广场</button>
+    <button data-page="chat">搭子</button>
+    <button data-page="wheel">求签</button>
+    <button data-page="profile">我的</button>
+  </nav>
+
+  <dialog id="book-dialog" class="book-dialog">
+    <div id="dialog-content"></div>
+  </dialog>
+  <script src="app.js"></script>
+</body>
+</html>

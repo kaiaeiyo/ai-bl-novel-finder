@@ -1,0 +1,9 @@
+__pycache__/
+.DS_Store
+.env
+*.pyc
+.idea/
+.pytest_cache/
+.streamlit/
+pythonProject/.favorites_session.json
+pythonProject/platform_score_degbug.py
