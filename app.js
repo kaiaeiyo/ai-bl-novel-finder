@@ -226,11 +226,12 @@ function scoreBook(book, query) {
 
 function searchBooks(query) {
   if (!query.trim()) return books.slice(0, 4);
-  return books
+  const hits = books
     .map((book) => ({ book, score: scoreBook(book, query) }))
     .filter((item) => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .map((item) => item.book);
+  return hits.length ? hits : books.slice(0, 4);
 }
 
 async function serverRecommend(query) {
@@ -325,6 +326,7 @@ function showcase(book) {
 }
 
 function renderHome(results = books.slice(0, 4)) {
+  const safeResults = results.length ? results : books.slice(0, 4);
   const collection = collections[state.homeCollectionIndex % collections.length];
   pageRoot.innerHTML = `
     <section class="hero-grid">
@@ -337,12 +339,12 @@ function renderHome(results = books.slice(0, 4)) {
           <button id="home-search">开始找文</button>
         </div>
       </div>
-      <div class="open-book fortune-bookmark-card" data-open="${results[0].id}" aria-label="今日签文">
+      <div class="open-book fortune-bookmark-card" data-open="${safeResults[0].id}" aria-label="今日签文">
         <div class="bookmark-hole"></div>
         <div class="bookmark-copy">
           <small>今日签文</small>
-          <h2>《${results[0].title}》</h2>
-          <p>${clipText(zhText(results[0].summary), 92)}</p>
+          <h2>《${safeResults[0].title}》</h2>
+          <p>${clipText(zhText(safeResults[0].summary), 92)}</p>
         </div>
       </div>
     </section>
@@ -351,7 +353,7 @@ function renderHome(results = books.slice(0, 4)) {
         <h2>${state.query ? "为你找到" : "热门书架"}</h2>
         <button class="text-button" id="shuffle-books">换一批</button>
       </div>
-      <div class="book-shelf">${results.map(tile).join("")}</div>
+      <div class="book-shelf">${safeResults.map(tile).join("")}</div>
     </section>
     <section class="collection-card">
       <button class="collection-nav prev" data-home-collection-flip="-1" aria-label="上一个合集">‹</button>
@@ -488,6 +490,17 @@ function render() {
   if (state.page === "profile") renderProfile();
 }
 
+async function runHomeSearch(query) {
+  state.query = (query || "").trim();
+  state.page = "home";
+  appShell.classList.remove("no-reader");
+  document.querySelector("#global-search").value = state.query;
+  document.querySelectorAll("[data-page]").forEach((button) => button.classList.toggle("active", button.dataset.page === "home"));
+  renderHome(searchBooks(state.query));
+  const results = await serverRecommend(state.query);
+  renderHome(results);
+}
+
 function openCollection(keyword = "强强", title = "强强互探合集") {
   const items = books.filter((book) => matchesCollection(book, keyword));
   const pool = items.length ? items : books;
@@ -618,9 +631,7 @@ document.addEventListener("click", async (event) => {
     render();
   }
   if (event.target.id === "home-search") {
-    state.query = document.querySelector("#home-query").value.trim();
-    appShell.classList.remove("no-reader");
-    renderHome(await serverRecommend(state.query));
+    await runHomeSearch(document.querySelector("#home-query").value);
   }
   if (event.target.id === "shuffle-books") {
     books.push(books.shift());
@@ -657,12 +668,15 @@ document.addEventListener("click", async (event) => {
 
 document.querySelector("#global-search").addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
-    state.query = event.target.value.trim();
-    state.page = "home";
-    appShell.classList.remove("no-reader");
-    document.querySelectorAll("[data-page]").forEach((button) => button.classList.toggle("active", button.dataset.page === "home"));
-    serverRecommend(state.query).then(renderHome);
+    event.preventDefault();
+    runHomeSearch(event.target.value);
   }
+});
+
+pageRoot.addEventListener("keydown", (event) => {
+  if (event.key !== "Enter" || event.target.id !== "home-query") return;
+  event.preventDefault();
+  document.querySelector("#home-search")?.click();
 });
 
 loadServerBooks().then(render);
