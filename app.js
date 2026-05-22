@@ -121,6 +121,7 @@ let state = {
   page: "home",
   query: "",
   squareIndex: 0,
+  squareResults: null,
   collectionIndex: 0,
   homeCollectionIndex: 0,
   chat: [
@@ -366,10 +367,16 @@ function renderHome(results = books.slice(0, 4)) {
 }
 
 function renderSquare() {
-  const book = books[state.squareIndex % books.length];
+  const pool = state.squareResults?.length ? state.squareResults : books;
+  const book = pool[state.squareIndex % pool.length];
   const favored = isFav(book.id);
+  const title = state.query ? `搜索：${state.query}` : "广场发现";
   pageRoot.innerHTML = `
     <section class="square-view">
+      <div class="square-search-title">
+        <p class="eyebrow">${title}</p>
+        <span>第 ${(state.squareIndex % pool.length) + 1} / ${pool.length} 本</span>
+      </div>
       <article class="flat-reader">
         <button class="flat-turn left" data-flip="-1">‹</button>
         <div class="flat-main">
@@ -392,8 +399,8 @@ function renderSquare() {
         <button class="flat-turn right" data-flip="1">›</button>
       </article>
       <div class="square-footer-meta">
-        <span>广场发现</span>
-        <span>第 ${state.squareIndex + 1} / ${books.length} 本</span>
+        <span>${title}</span>
+        <span>第 ${(state.squareIndex % pool.length) + 1} / ${pool.length} 本</span>
       </div>
     </section>
   `;
@@ -492,13 +499,17 @@ function render() {
 
 async function runHomeSearch(query) {
   state.query = (query || "").trim();
-  state.page = "home";
-  appShell.classList.remove("no-reader");
+  state.page = "square";
+  state.squareIndex = 0;
+  state.squareResults = searchBooks(state.query);
+  appShell.classList.add("no-reader");
   document.querySelector("#global-search").value = state.query;
-  document.querySelectorAll("[data-page]").forEach((button) => button.classList.toggle("active", button.dataset.page === "home"));
-  renderHome(searchBooks(state.query));
+  document.querySelectorAll("[data-page]").forEach((button) => button.classList.toggle("active", button.dataset.page === "square"));
+  renderSquare();
   const results = await serverRecommend(state.query);
-  renderHome(results);
+  state.squareResults = results.length ? results : searchBooks(state.query);
+  state.squareIndex = 0;
+  renderSquare();
 }
 
 function openCollection(keyword = "强强", title = "强强互探合集") {
@@ -585,6 +596,9 @@ document.addEventListener("click", async (event) => {
   const pageButton = event.target.closest("[data-page], [data-page-jump]");
   if (pageButton) {
     state.page = pageButton.dataset.page || pageButton.dataset.pageJump;
+    if (state.page !== "square") {
+      state.squareResults = null;
+    }
     render();
     return;
   }
@@ -627,7 +641,8 @@ document.addEventListener("click", async (event) => {
   }
   const flip = event.target.closest("[data-flip]");
   if (flip) {
-    state.squareIndex = (state.squareIndex + Number(flip.dataset.flip) + books.length) % books.length;
+    const poolLength = state.squareResults?.length || books.length;
+    state.squareIndex = (state.squareIndex + Number(flip.dataset.flip) + poolLength) % poolLength;
     render();
   }
   if (event.target.id === "home-search") {

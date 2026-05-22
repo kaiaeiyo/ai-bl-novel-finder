@@ -549,6 +549,21 @@ p {
   margin-bottom: 18px;
 }
 
+.square-search-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.square-search-title .eyebrow {
+  margin: 0;
+}
+
 .square-footer-meta {
   display: flex;
   justify-content: center;
